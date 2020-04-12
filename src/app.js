@@ -5,12 +5,12 @@ import cors from 'cors';
 import http from 'http';
 import dotenv from 'dotenv';
 
-dotenv.config();
-
 import token_middleware from './middlewares/token';
 import auth_middleware from './middlewares/auth';
 
 import * as routes from './routes';
+
+dotenv.config();
 
 const app = express();
 const server = new http.Server(app);
