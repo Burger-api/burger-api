@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 
 import token_middleware from './middlewares/token';
 import auth_middleware from './middlewares/auth';
+import status_middleware from './middlewares/status';
 
 import * as routes from './routes';
 
@@ -24,6 +25,7 @@ app.use(body_parser.json());
 
 app.use(token_middleware);
 app.use(auth_middleware);
+app.use(status_middleware)
 
 app.use(cors());
 

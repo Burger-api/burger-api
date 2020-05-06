@@ -62,3 +62,30 @@ router.get('/users/:id', guard({ auth: constants.AUTH }), async (req, res) => {
     res.status(404).send(ErrorsGenerator.gen([`This user doesn't exist.`]))
   }
 });
+
+router.put('/users/:id/status', guard({ auth: constants.AUTH, requested_status: constants.ADMIN }), async (req, res) => {
+  try {
+    const user = await users.model.findById(req.params.id).lean();
+
+    if (!user) {
+      return res.status(404).send(ErrorsGenerator.gen([`This user doesn't exist.`]))
+    }
+
+    const new_status = req.body.status
+    console.log(new_status + user._id)
+
+    await users.model.updateOne(
+      { _id: user._id },
+      {
+        status: new_status,
+      }
+    )
+
+    res.status(200).json({
+      success: true,
+    })
+
+  } catch {
+    res.status(501).send(ErrorsGenerator.gen([`Something went wrong.`]))
+  }
+});
