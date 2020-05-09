@@ -5,11 +5,10 @@ export default router;
 
 import Joi from '@hapi/joi';
 import guard from "../middlewares/guard";
+import validateSchema, { SchemaError } from '../middlewares/joi-schema';
 import * as constants from "../constants";
 
-import * as users from '../models/users';
 import * as products from '../models/products';
-import schema from '../middlewares/joi-schema';
 
 /**
  * Get all products
@@ -27,10 +26,13 @@ router.get('/products', guard({auth: constants.NOT_AUTH}), async (req, res) => {
   }
 });
 
+/**
+ * @typedef SchemasOptions
+ */
 const productSchemaPost = Joi.object().keys({
-  name: Joi.string().required(),
-  category: Joi.string().required(),
-  price: Joi.number().required(),
+  name: Joi.string().required().error(() => new SchemaError('Name is required.')),
+  category: Joi.string().required().error(() => new SchemaError('Category is required.')),
+  price: Joi.number().required().error(() => new SchemaError('Price is required.')),
 });
 
 /**
@@ -39,7 +41,7 @@ const productSchemaPost = Joi.object().keys({
 router.post('/products', guard({
   auth: constants.AUTH,
   requested_status: constants.ADMIN,
-}), schema({ body: productSchemaPost }), async (req, res) => {
+}), validateSchema({ body: productSchemaPost }), async (req, res) => {
   try {
     let {name, category, price} = req.body || {};
 
