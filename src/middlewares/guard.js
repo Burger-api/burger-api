@@ -25,8 +25,8 @@ export default (options = default_options) => {
       }
     }
 
-    if(req.user_status !== 'admin'){
-      if(options.requested_status !== req.user_status){
+    if (req.user_status !== 'admin') {
+      if (options.requested_status !== req.user_status) {
         return res.status(403).end();
       }
     }
