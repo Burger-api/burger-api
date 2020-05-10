@@ -1,5 +1,4 @@
 import {Router} from 'express';
-
 const router = Router();
 export default router;
 
@@ -39,66 +38,60 @@ const productSchemaPost = Joi.object().keys({
 /**
  * Create a new product.
  */
-router.post('/products', guard({
-  auth: constants.AUTH,
-  requested_status: constants.ADMIN,
-}), validateSchema({body: productSchemaPost}), async (req, res) => {
-  try {
-    let {name, category, price} = req.body || {};
-
-    if (await products.model.exists({name})) {
-      return res.status(409).json({
-        success: false,
-        errors: ['Product name already exists.'],
-      });
-    }
-
-    const product = await products.model.create({
-      name,
-      category,
-      price,
-    });
-
-    res.status(201).json({
-      success: true,
-      product,
-    });
-
-  } catch {
-    res.status(500).end();
-  }
-});
-
-/**
- * Get a specific product
- */
-router.get('/products/:id',
-  guard({auth: constants.NOT_AUTH}),
-  async (req, res) => {
+router.post('/products',
+  guard({auth: constants.AUTH, requested_status: constants.ADMIN,}),
+  validateSchema({body: productSchemaPost}), async (req, res) => {
     try {
-      const _id = req.params.id;
+      let {name, category, price} = req.body || {};
 
-      if (!db.Types.ObjectId.isValid(_id)) {
-        return res.status(400).json({
+      if (await products.model.exists({name})) {
+        return res.status(409).json({
           success: false,
-          errors: ['Invalid parameters.'],
+          errors: ['Product name already exists.'],
         });
       }
 
-      const product = await products.model.findById(_id);
+      const product = await products.model.create({
+        name,
+        category,
+        price,
+      });
 
-      if (!product) {
-        return res.status(404).json({
-          success: false,
-          errors: ['Resource does not exist.'],
-        });
-      }
+      res.status(201).json({success: true, product,});
 
-      res.json({ success: true, product });
     } catch {
       res.status(500).end();
     }
   });
+
+/**
+ * Get a specific product
+ */
+router.get('/products/:id', guard({auth: constants.NOT_AUTH}), async (req, res) => {
+  try {
+    const _id = req.params.id;
+
+    if (!db.Types.ObjectId.isValid(_id)) {
+      return res.status(400).json({
+        success: false,
+        errors: ['Invalid parameters.'],
+      });
+    }
+
+    const product = await products.model.findById(_id);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        errors: ['Resource does not exist.'],
+      });
+    }
+
+    res.json({ success: true, product });
+  } catch {
+    res.status(500).end();
+  }
+});
 
 /**
  * Update a specific product

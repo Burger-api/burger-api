@@ -1,9 +1,10 @@
-import { Router } from 'express'
+import {Router} from 'express'
+
 const router = Router();
 export default router
 
 router.get('/', (req, res) => {
-  res.send({
+  res.json({
     name: 'Burger-API!',
   })
 });
