@@ -7,14 +7,3 @@ export const model = db.model('Product', {
     active: { type: Boolean, default: true },
     date: { type: Date, default: Date.now, },
 });
-
-export function sanitize(product) {
-    if (!product) return {};
-
-    return {
-        id: product._id,
-        name: product.name,
-        category: product.category,
-        price: product.price,
-    }
-}
