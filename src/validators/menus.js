@@ -4,7 +4,7 @@ import {SchemaError} from "../middlewares/joi-schema";
 /**
  * @typedef SchemasOptions
  */
-export const post = Joi.object().keys({
+export const bodySchema = Joi.object().keys({
   name: Joi.string().required(),
   limits: Joi.object().keys({
     burgers: Joi.number().integer().min(0),
@@ -13,7 +13,7 @@ export const post = Joi.object().keys({
     snacks: Joi.number().integer().min(0),
     salads: Joi.number().integer().min(0),
     desserts: Joi.number().integer().min(0),
-  }),
+  }).required(),
   products: Joi.array().items(Joi.string()).required(),
   price: Joi.number().min(3).required().error(() => new SchemaError('Price is required and must be at least equal to 3.')),
 });
