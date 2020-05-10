@@ -4,6 +4,6 @@ export const model = db.model('Product', {
     name: { type: String, },
     category: { type: String, },
     price: { type: Number, },
-    date: { type: Date, default: Date.now, }
+    active: { type: Boolean, default: true },
+    date: { type: Date, default: Date.now, },
 });
-
