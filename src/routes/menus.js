@@ -1,50 +1,61 @@
-import { Router } from 'express';
-const router = Router();
-export default router;
+import {Router} from 'express';
+import * as validator from '../validators/menus'
 
 import * as constants from '../constants';
 import guard from '../middlewares/guard';
+import validateSchema from '../middlewares/joi-schema'
 
-import * as users from '../models/users';
-import * as menus from  '../models/menus';
+import * as menus from '../models/menus';
 
-router.get('/menus', guard({auth: constants.NOT_AUTH}), async (req, res) => {
+const router = Router();
+export default router;
+
+router.get('/menus',async (req, res) => {
+  try {
+    const result = await menus.model.find().populate('default_products');
+
+    res.status(200).json({
+      success: true,
+      menus: result,
+    });
+  } catch(e) {
+    res.status(400).json({
+      success: false,
+      errors: [e.message],
+    });
+  }
+});
+
+router.post('/menus',
+  guard({ auth: constants.AUTH, requested_status: constants.ADMIN }),
+  validateSchema({ body: validator.post }),
+  async (req, res) => {
     try {
-        const result = await menus.model.find().populate('foodstuffs');
+      const { name, products, limits, price } = req.body || {};
+      const errors = await menus.isValid(name, products, limits);
 
-        res.status(200).json({
-            success: true,
-            menus: result,
+      if (errors.length) {
+        return res.status(400).json({
+          success: false,
+          errors
         });
-    } catch {
-        res.status(400).end();
+      }
+
+      const menu = await menus.model.create({
+        name,
+        limits,
+        default_products: products,
+        price,
+      });
+
+      res.status(201).json({
+        success: true,
+        menu,
+      });
+    } catch (e) {
+      res.status(500).json( {
+        success: false,
+        errors: [e.message],
+      });
     }
-});
-
-router.post('/menus', guard({auth: constants.AUTH}), async (req, res) => {
-    try {
-        const user = await users.find_by_token(req.token);
-        let {name, foodstuffs, price} = req.body || {};
-
-        if (typeof name !== 'string' || typeof price !== 'number' || typeof foodstuffs !== 'object') {
-            res.status(400).end();
-        }
-
-        if (user.status === 'admin') {
-            const menu = await menus.model.create({
-                name,
-                foodstuffs,
-                price,
-            });
-
-            res.status(201).send({
-                success: true,
-                menu,
-            });
-        } else {
-            res.status(403).end();
-        }
-    } catch {
-        res.status(500).end();
-    }
-});
+  });
