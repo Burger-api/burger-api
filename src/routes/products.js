@@ -1,23 +1,23 @@
 import {Router} from 'express';
-const router = Router();
-export default router;
-
 import guard from "../middlewares/guard";
 import * as constants from "../constants";
 
 import * as users from '../models/users';
-import * as foodstuffs from "../models/foodstuffs";
+import * as products from "../models/products";
+
+const router = Router();
+export default router;
 
 /**
  * Get all products
  */
-router.get('/foodstuffs', guard({auth: constants.NOT_AUTH}), async (req, res) => {
+router.get('/products', guard({auth: constants.NOT_AUTH}), async (req, res) => {
   try {
-    const result = await foodstuffs.model.find();
+    const result = await products.model.find();
 
     res.status(200).json({
       success: true,
-      foodstuffs: result,
+      products: result,
     });
   } catch {
     res.status(500).end();
@@ -27,7 +27,7 @@ router.get('/foodstuffs', guard({auth: constants.NOT_AUTH}), async (req, res) =>
 /**
  * Create a new product.
  */
-router.post('/foodstuffs', guard({auth: constants.AUTH}), async (req, res) => {
+router.post('/products', guard({auth: constants.AUTH}), async (req, res) => {
   try {
     const user = await users.find_by_token(req.token);
     let { name, category, price } = req.body || {};
@@ -37,7 +37,7 @@ router.post('/foodstuffs', guard({auth: constants.AUTH}), async (req, res) => {
     }
 
     if (user.status === 'admin') {
-      const product = await foodstuffs.model.create({
+      const product = await products.model.create({
         name,
         category,
         price,
@@ -58,9 +58,9 @@ router.post('/foodstuffs', guard({auth: constants.AUTH}), async (req, res) => {
 /**
  * Get all products of type: drinks
  */
-router.get('/foodstuffs/drinks', guard({ auth:(constants.NOT_AUTH) }), async (req, res) => {
+router.get('/products/drinks', guard({ auth:(constants.NOT_AUTH) }), async (req, res) => {
   try {
-    const result = await foodstuffs.model.find({ category: 'drinks' });
+    const result = await products.model.find({ category: 'drinks' });
 
     res.status(200).json({
       success: true,
@@ -74,9 +74,9 @@ router.get('/foodstuffs/drinks', guard({ auth:(constants.NOT_AUTH) }), async (re
 /**
  * Get all products of type: burgers
  */
-router.get('/foodstuffs/burgers', guard({ auth:(constants.NOT_AUTH) }), async (req, res) => {
+router.get('/products/burgers', guard({ auth:(constants.NOT_AUTH) }), async (req, res) => {
   try {
-    const result = await foodstuffs.model.find({ category: 'burgers' });
+    const result = await products.model.find({ category: 'burgers' });
 
     res.status(200).json({
       success: true,
@@ -90,9 +90,9 @@ router.get('/foodstuffs/burgers', guard({ auth:(constants.NOT_AUTH) }), async (r
 /**
  * Get all products of type: sides
  */
-router.get('/foodstuffs/sides', guard({ auth:(constants.NOT_AUTH) }), async (req, res) => {
+router.get('/products/sides', guard({ auth:(constants.NOT_AUTH) }), async (req, res) => {
   try {
-    const result = await foodstuffs.model.find({ category: 'sides' });
+    const result = await products.model.find({ category: 'sides' });
 
     res.status(200).json({
       success: true,

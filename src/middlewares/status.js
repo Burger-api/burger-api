@@ -1,4 +1,3 @@
-import * as tokens from '../models/tokens'
 import * as users from '../models/users';
 
 /**
@@ -11,7 +10,6 @@ export default async (req, res, next) => {
   } else {
     req.user_status = 'customer'
   }
-    
-
+  
   next()
 }
