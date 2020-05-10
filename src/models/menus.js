@@ -19,12 +19,11 @@ export const model = db.model('Menu', {
 });
 
 /**
- * @param name {string}
  * @param defaultProducts {string[]}
  * @param limits {Limit}
  * @return {Promise<string[]>}
  */
-export async function isValid(name, defaultProducts, limits) {
+export async function isValid(defaultProducts, limits) {
   try {
     const sumOfLimits = Object.values(limits).reduce((acc, value) => acc + value);
     const errors = [];
@@ -35,10 +34,6 @@ export async function isValid(name, defaultProducts, limits) {
 
     if (!await validateProductsAndLimits(defaultProducts, limits)) {
       errors.push('The default products do not match with the limits set.')
-    }
-
-    if (await model.exists({ name })) {
-      errors.push('This name is already used for an existing menu.')
     }
 
     return errors;
