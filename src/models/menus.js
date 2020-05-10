@@ -61,7 +61,6 @@ async function validateProductsAndLimits(defaultProducts, limits) {
 
     for (const _id of defaultProducts) {
       const product = await products.model.findById(_id);
-      product.price = 0;
       productsList.push(product);
       for (const key in copyOfLimits) {
         if (key === product.category) {
@@ -77,6 +76,7 @@ async function validateProductsAndLimits(defaultProducts, limits) {
         }
       }
     }
+
     return true;
 
   } catch (e) {
