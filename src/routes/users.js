@@ -72,7 +72,6 @@ router.put('/users/:id/status', guard({ auth: constants.AUTH, requested_status: 
     }
 
     const new_status = req.body.status
-    console.log(new_status + user._id)
 
     await users.model.updateOne(
       { _id: user._id },
