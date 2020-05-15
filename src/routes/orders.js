@@ -76,7 +76,7 @@ router.post('/orders', guard({ requested_status: constants.CUSTOMER }),
 
       if (filledMenus.errors) {
         return res.status(400).send({
-          succes: false,
+          success: false,
           errors: [filledMenus.errors],
         })
       } else {
