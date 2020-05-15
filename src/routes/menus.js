@@ -63,6 +63,16 @@ router.get('/menus/promotions/ongoing', async (req, res) => {
   }
 });
 
+router.get('/menus/promotions/ended', async (req, res) => {
+  try {
+    const result = await menus.model.find({ promotion_end: { $lte: Date.now() } }).populate('default_products');
+
+    res.json({ success: true, menus: result });
+  } catch (e) {
+    res.status(500).json({ success: false, errors: [e.message] })
+  }
+});
+
 router.get('/menus/:id', async  (req, res) => {
   try {
     const _id = req.params.id || '';
