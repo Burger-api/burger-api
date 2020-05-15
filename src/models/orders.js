@@ -21,6 +21,7 @@ export const model = db.model('Order', {
   status: { type: String, default: 'pending' },
   customer: { type: db.Types.ObjectId, ref: 'User' },
   created: { type: Date, default: Date.now, },
+  active: { type: Boolean, default: true }
 });
 
 
