@@ -12,8 +12,17 @@ import * as orders from '../models/orders'
 import * as menus from '../models/menus'
 import * as products from '../models/products'
 
-router.get('/orders', guard({ auth: constants.AUTH }), async (req, res) => {
+router.get('/orders', guard({ auth: constants.AUTH, requested_status: constants.ADMIN }), async (req, res) => {
   const result = await orders.model.find().populate('data');
+
+  res.json({
+    success: true,
+    orders: result,
+  });
+});
+
+router.get('/orders/in_pending', guard({ auth: constants.AUTH }), async (req, res) => {
+  const result = await orders.model.find({ status: 'pending' }).populate('data');
 
   res.json({
     success: true,
@@ -64,7 +73,7 @@ router.post('/orders', guard({ requested_status: constants.CUSTOMER }),
       });
 
       return res.json({
-        success: true, 
+        success: true,
         order,
       });
     } catch (e) {
