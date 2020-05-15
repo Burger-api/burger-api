@@ -33,6 +33,16 @@ router.get('/menus/classic', async (req, res) => {
   }
 });
 
+router.get('/menus/promotions', async (req, res) => {
+  try {
+    const result = await menus.model.find({ promotion_start: { $ne: null } }).populate('default_products');
+
+    res.json({ success: true, menus: result });
+  } catch (e) {
+    res.status(500).json({ success: false, errors: [e.message] })
+  }
+});
+
 router.get('/menus/:id', async  (req, res) => {
   try {
     const _id = req.params.id || '';
