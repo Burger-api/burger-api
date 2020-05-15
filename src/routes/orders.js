@@ -89,7 +89,7 @@ router.post('/orders', guard({ requested_status: constants.CUSTOMER }),
 
       if (filledStandAloneProducts.errors) {
         return res.status(400).send({
-          succes: false,
+          success: false,
           errors: [filledStandAloneProducts.error],
         })
       } else {
