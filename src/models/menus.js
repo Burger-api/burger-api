@@ -100,10 +100,10 @@ export async function checkAndGetAllByIds(menuArray) {
       }
 
       menusFilledArray.push({
-        id: menu._id,
-        name: menu.name,
-        products: productsData,
-        price: menu.price,
+        original_id: menu._id,
+        original_name: menu.name,
+        original_products: productsData,
+        original_price: menu.price,
       })
     }
 
