@@ -14,21 +14,29 @@ import { bodySchema } from '../validators/orders'
 import db from "../db";
 
 router.get('/orders', guard({ auth: constants.AUTH, requested_status: constants.ADMIN }), async (req, res) => {
-  const result = await orders.model.find().populate('data');
+  try {
+    const result = await orders.model.find().populate('data');
 
-  res.json({
-    success: true,
-    orders: result,
-  });
+    res.json({
+      success: true,
+      orders: result,
+    });
+  } catch (e) {
+    return res.status(500).json({ success: false, errors: [e], });
+  }
 });
 
-router.get('/orders/in_pending', guard({ auth: constants.AUTH, requested_status: constants.PREPARATOR }), async (req, res) => {
-  const result = await orders.model.find({ status: 'pending' }).populate('data');
+router.get('/orders/pending', guard({ auth: constants.AUTH, requested_status: constants.PREPARATOR }), async (req, res) => {
+  try {
+    const result = await orders.model.find({ status: 'pending' }).populate('data');
 
-  res.json({
-    success: true,
-    orders: result,
-  });
+    res.json({
+      success: true,
+      orders: result,
+    });
+  } catch {
+    return res.status(500).json({ success: false, errors: [e], });
+  }
 });
 
 router.post('/orders', guard({ requested_status: constants.CUSTOMER }),
@@ -55,20 +63,21 @@ router.post('/orders', guard({ requested_status: constants.CUSTOMER }),
       if (filledStandAloneProducts.errors) {
         return res.status(400).send({
           succes: false,
-          error: [filledStandAloneProducts.error],
+          errors: [filledStandAloneProducts.error],
         })
       } else {
         filledStandAloneProducts = await orders.sanitizeInsertedProducts(filledStandAloneProducts)
       }
 
-      let full_price = 0
-      full_price = filledMenus.reduce((acc, menu) => { return acc + menu.original_price }, full_price) +
-        filledStandAloneProducts.reduce((acc, product) => { return acc + product.original_price }, full_price)
+
+      const fullMenuPrice = filledMenus.reduce((acc, menu) => { return acc + menu.original_price }, 0)
+      const fullProductsPrice = filledStandAloneProducts.reduce((acc, product) => { return acc + product.original_price }, 0)
+      const fullPrice = fullMenuPrice + fullProductsPrice
 
       const order = await orders.model.create({
         menus: filledMenus,
         standalone_products: filledStandAloneProducts,
-        price: full_price,
+        price: fullPrice,
         status: status || 'pending',
         customer: connectedUserId || null,
       });

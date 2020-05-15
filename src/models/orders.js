@@ -34,5 +34,4 @@ export async function sanitizeInsertedProducts(products) {
       original_price: product.price,
     }
   })
-
 }
