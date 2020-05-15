@@ -21,7 +21,7 @@ router.get('/orders', guard({ auth: constants.AUTH, requested_status: constants.
   });
 });
 
-router.get('/orders/in_pending', guard({ auth: constants.AUTH }), async (req, res) => {
+router.get('/orders/in_pending', guard({ auth: constants.AUTH, requested_status: constants.PREPARATOR }), async (req, res) => {
   const result = await orders.model.find({ status: 'pending' }).populate('data');
 
   res.json({
