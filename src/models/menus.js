@@ -1,5 +1,6 @@
 import db from "../db";
 import * as products from "./products"
+import { menus } from "../routes";
 
 export const Limit = new db.Schema({
   burgers: { type: Number, default: 0, },
@@ -76,5 +77,39 @@ async function validateProductsAndLimits(defaultProducts, limits) {
 
   } catch (e) {
     throw new Error(e.message);
+  }
+}
+
+export async function checkAndGetAllByIds(menuArray) {
+  try {
+    const menusFilledArray = []
+    for (const menuData of menuArray) {
+
+      const menu = await model.findById(menuData.id)
+      if (!menu) {
+        return { errors: `Required menu doesn't exist` }
+      }
+
+      const productsData = await products.checkAndGetAllById(menuData.products)
+      if (productsData.errors) {
+        return { errors: productsData.errors }
+      }
+
+      if (!await validateProductsAndLimits(menuData.products, menu.limits)) {
+        return { errors: `Passed list of products doesn't match menu limit` }
+      }
+
+      menusFilledArray.push({
+        id: menu._id,
+        name: menu.name,
+        products: productsData,
+        price: menu.price,
+      })
+    }
+
+    return menusFilledArray
+  } catch (e) {
+    throw new Error(e.message);
+
   }
 }
