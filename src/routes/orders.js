@@ -81,3 +81,31 @@ router.post('/orders', guard({ requested_status: constants.CUSTOMER }),
     }
 
   });
+
+router.put('/orders/checkin/:id', guard({ auth: constants.AUTH, constants: constants.PREPARATOR }), async (req, res) => {
+  try {
+
+    const order = await orders.model.findById(req.params.id)
+    if (!order) {
+      return res.statusCode(400).json({
+        success: false,
+        errors: ['Please provide a valid order id'],
+      })
+    }
+
+    await orders.model.updateOne(
+      {
+        _id: order._id,
+      },
+      {
+        status: 'delivered',
+      })
+
+    return res.status(200).json({
+      succes: true,
+    })
+  } catch (e) {
+    return res.status(500).json({ success: false, errors: ['an error occured'], });
+
+  }
+})
