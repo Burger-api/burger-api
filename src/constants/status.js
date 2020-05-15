@@ -1,3 +1,3 @@
 export const CUSTOMER = 'customer';
-export const PREPARATOR = 'preparator';
+export const COOKER = 'cooker';
 export const ADMIN = 'admin';

@@ -1,7 +1,4 @@
-import { Router } from 'express'
-const router = Router();
-export default router
-
+import {Router} from 'express'
 import Joi from '@hapi/joi';
 
 import * as constants from '../constants'
@@ -9,9 +6,12 @@ import guard from '../middlewares/guard'
 import * as orders from '../models/orders'
 import * as menus from '../models/menus'
 import * as products from '../models/products'
-import validateSchema, { SchemaError } from '../middlewares/joi-schema'
-import { bodySchema } from '../validators/orders'
+import validateSchema, {SchemaError} from '../middlewares/joi-schema'
+import {bodySchema} from '../validators/orders'
 import db from "../db";
+
+const router = Router();
+export default router
 
 router.get('/orders', guard({ auth: constants.AUTH, requested_status: constants.ADMIN }), async (req, res) => {
   try {
@@ -53,7 +53,7 @@ router.get('/orders/:id', guard({ auth: constants.AUTH, requested_status: consta
   }
 });
 
-router.get('/orders/pending', guard({ auth: constants.AUTH, requested_status: constants.PREPARATOR }), async (req, res) => {
+router.get('/orders/pending', guard({ auth: constants.AUTH, requested_status: constants.COOKER }), async (req, res) => {
   try {
     const result = await orders.model.find({ status: 'pending' }).populate('data');
 
@@ -119,7 +119,7 @@ router.post('/orders', guard({ requested_status: constants.CUSTOMER }),
 
   });
 
-router.put('/orders/checkin/:id', guard({ auth: constants.AUTH, constants: constants.PREPARATOR }), async (req, res) => {
+router.put('/orders/checkin/:id', guard({ auth: constants.AUTH, constants: constants.COOKER }), async (req, res) => {
   try {
     const _id = req.params.id || '';
 

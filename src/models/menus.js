@@ -1,6 +1,5 @@
 import db from "../db";
 import * as products from "./products"
-import { menus } from "../routes";
 
 export const Limit = new db.Schema({
   burgers: { type: Number, default: 0, },
