@@ -26,6 +26,33 @@ router.get('/orders', guard({ auth: constants.AUTH, requested_status: constants.
   }
 });
 
+router.get('/orders/:id', guard({ auth: constants.AUTH, requested_status: constants.ADMIN }), async (req, res) => {
+  try {
+
+    const _id = req.params.id || '';
+
+    if (!db.Types.ObjectId.isValid(_id)) {
+      return res.status(400).json({
+        success: false,
+        errors: ['Invalid parameters.'],
+      });
+    }
+
+    if (!await orders.model.exists({ _id })) {
+      return res.status(404).json({ success: false, errors: ['Resource does not exist.'] });
+    }
+
+    const result = await orders.model.findById({ _id })
+
+    res.json({
+      success: true,
+      orders: result,
+    });
+  } catch (e) {
+    return res.status(500).json({ success: false, errors: [e], });
+  }
+});
+
 router.get('/orders/pending', guard({ auth: constants.AUTH, requested_status: constants.PREPARATOR }), async (req, res) => {
   try {
     const result = await orders.model.find({ status: 'pending' }).populate('data');
