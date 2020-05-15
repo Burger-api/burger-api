@@ -6,6 +6,7 @@ import Joi from '@hapi/joi';
 import guard from "../middlewares/guard";
 import validateSchema, {SchemaError} from '../middlewares/joi-schema';
 import * as constants from "../constants";
+import * as validator from "../validators/products";
 import db from "../db";
 
 import * as products from '../models/products';
@@ -27,20 +28,11 @@ router.get('/products', guard({auth: constants.NOT_AUTH}), async (req, res) => {
 });
 
 /**
- * @typedef SchemasOptions
- */
-const productSchemaPost = Joi.object().keys({
-  name: Joi.string().required().error(() => new SchemaError('Name is required.')),
-  category: Joi.string().required().error(() => new SchemaError('Category is required.')),
-  price: Joi.number().required().error(() => new SchemaError('Price is required.')),
-});
-
-/**
  * Create a new product.
  */
 router.post('/products',
   guard({auth: constants.AUTH, requested_status: constants.ADMIN,}),
-  validateSchema({body: productSchemaPost}), async (req, res) => {
+  validateSchema({body: validator.productSchemaPost}), async (req, res) => {
     try {
       let {name, category, price} = req.body || {};
 
@@ -98,7 +90,7 @@ router.get('/products/:id', guard({auth: constants.NOT_AUTH}), async (req, res) 
  */
 router.put('/products/:id',
   guard({auth: constants.AUTH, requested_status: constants.ADMIN}),
-  validateSchema({body: productSchemaPost}), async (req, res) => {
+  validateSchema({body: validator.productSchemaPost}), async (req, res) => {
     try {
       const _id = req.params.id || '';
 
@@ -165,18 +157,11 @@ router.get('/products/categories/:category', guard({auth: (constants.NOT_AUTH)})
 });
 
 /**
- * @typedef SchemasOptions
- */
-const productActivateSchema = Joi.object().keys({
-  active: Joi.boolean().required().error(() => new SchemaError('Expect a required boolean.')),
-});
-
-/**
  * Enable or disable a single product
  */
 router.put('/products/:id/activate',
   guard({auth: constants.AUTH, requested_status: constants.ADMIN}),
-  validateSchema({body: productActivateSchema}),
+  validateSchema({body: validator.productActivateSchema}),
   async (req, res) => {
     try {
       const {active} = req.body;

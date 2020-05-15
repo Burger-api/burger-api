@@ -23,6 +23,56 @@ router.get('/menus',async (req, res) => {
   }
 });
 
+router.get('/menus/classic', async (req, res) => {
+  try {
+    const result = await menus.model.find({ promotion_start: null, promotion_end: null }).populate('default_products');
+
+    res.json({ success: true, menus: result });
+  } catch (e) {
+    res.status(500).json({ success: false, errors: [e.message] })
+  }
+});
+
+router.get('/menus/promotions', async (req, res) => {
+  try {
+    const result = await menus.model.find({ promotion_start: { $ne: null } }).populate('default_products');
+
+    res.json({ success: true, menus: result });
+  } catch (e) {
+    res.status(500).json({ success: false, errors: [e.message] })
+  }
+});
+
+router.get('/menus/promotions/permanent', async (req, res) => {
+  try {
+    const result = await menus.model.find({ promotion_start: { $ne: null }, promotion_end: null }).populate('default_products');
+
+    res.json({ success: true, menus: result });
+  } catch (e) {
+    res.status(500).json({ success: false, errors: [e.message] })
+  }
+});
+
+router.get('/menus/promotions/ongoing', async (req, res) => {
+  try {
+    const result = await menus.model.find({ promotion_start: { $lte: Date.now() }, promotion_end: { $gt: Date.now() } }).populate('default_products');
+
+    res.json({ success: true, menus: result });
+  } catch (e) {
+    res.status(500).json({ success: false, errors: [e.message] })
+  }
+});
+
+router.get('/menus/promotions/ended', async (req, res) => {
+  try {
+    const result = await menus.model.find({ promotion_end: { $lte: Date.now() } }).populate('default_products');
+
+    res.json({ success: true, menus: result });
+  } catch (e) {
+    res.status(500).json({ success: false, errors: [e.message] })
+  }
+});
+
 router.get('/menus/:id', async  (req, res) => {
   try {
     const _id = req.params.id || '';
@@ -49,7 +99,7 @@ router.post('/menus',
   validateSchema({ body: bodySchema }),
   async (req, res) => {
     try {
-      const { name, products, limits, price } = req.body || {};
+      const { name, products, limits, price, promotion_start, promotion_end } = req.body || {};
       const errors = await menus.isValid(products, limits);
 
       if (await model.exists({ name })) {
@@ -65,6 +115,8 @@ router.post('/menus',
         limits,
         default_products: products,
         price,
+        promotion_start,
+        promotion_end,
       });
 
       res.status(201).json({ success: true, menu, });
@@ -85,7 +137,7 @@ router.put('/menus/:id',
         return res.status(400).json({ success: false, errors: ['Invalid parameters.'], });
       }
 
-      const { name, products, limits, price } = req.body || {};
+      const { name, products, limits, price, promotion_start, promotion_end } = req.body || {};
       const errors = await menus.isValid(products, limits);
       const menusList = await model.find({ name });
 
@@ -105,6 +157,8 @@ router.put('/menus/:id',
         default_products: products,
         limits,
         price,
+        promotion_start,
+        promotion_end,
       });
 
       res.json({ success: true, });
