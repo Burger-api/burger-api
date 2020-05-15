@@ -49,7 +49,7 @@ router.post('/menus',
   validateSchema({ body: bodySchema }),
   async (req, res) => {
     try {
-      const { name, products, limits, price } = req.body || {};
+      const { name, products, limits, price, promotion_start, promotion_end } = req.body || {};
       const errors = await menus.isValid(products, limits);
 
       if (await model.exists({ name })) {
@@ -65,6 +65,8 @@ router.post('/menus',
         limits,
         default_products: products,
         price,
+        promotion_start,
+        promotion_end,
       });
 
       res.status(201).json({ success: true, menu, });

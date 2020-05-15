@@ -16,4 +16,6 @@ export const bodySchema = Joi.object().keys({
   }).required(),
   products: Joi.array().items(Joi.string()).required(),
   price: Joi.number().min(3).required().error(() => new SchemaError('Price is required and must be at least equal to 3.')),
+  promotion_start: Joi.string(),
+  promotion_end: Joi.string(),
 });
