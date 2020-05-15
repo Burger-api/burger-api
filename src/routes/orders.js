@@ -2,15 +2,16 @@ import { Router } from 'express'
 const router = Router();
 export default router
 
+import Joi from '@hapi/joi';
+
 import * as constants from '../constants'
 import guard from '../middlewares/guard'
-import validateSchema from '../middlewares/joi-schema'
-import { bodySchema } from '../validators/orders'
-
-
 import * as orders from '../models/orders'
 import * as menus from '../models/menus'
 import * as products from '../models/products'
+import validateSchema, { SchemaError } from '../middlewares/joi-schema'
+import { bodySchema } from '../validators/orders'
+import db from "../db";
 
 router.get('/orders', guard({ auth: constants.AUTH, requested_status: constants.ADMIN }), async (req, res) => {
   const result = await orders.model.find().populate('data');
@@ -84,18 +85,22 @@ router.post('/orders', guard({ requested_status: constants.CUSTOMER }),
 
 router.put('/orders/checkin/:id', guard({ auth: constants.AUTH, constants: constants.PREPARATOR }), async (req, res) => {
   try {
+    const _id = req.params.id || '';
 
-    const order = await orders.model.findById(req.params.id)
-    if (!order) {
-      return res.statusCode(400).json({
+    if (!db.Types.ObjectId.isValid(_id)) {
+      return res.status(400).json({
         success: false,
-        errors: ['Please provide a valid order id'],
-      })
+        errors: ['Invalid parameters.'],
+      });
+    }
+
+    if (!await orders.model.exists({ _id })) {
+      return res.status(404).json({ success: false, errors: ['Resource does not exist.'] });
     }
 
     await orders.model.updateOne(
       {
-        _id: order._id,
+        _id,
       },
       {
         status: 'delivered',
@@ -107,5 +112,40 @@ router.put('/orders/checkin/:id', guard({ auth: constants.AUTH, constants: const
   } catch (e) {
     return res.status(500).json({ success: false, errors: ['an error occured'], });
 
+  }
+})
+
+/**
+ * @typedef SchemasOptions
+ */
+const orderActivateSchema = Joi.object().keys({
+  active: Joi.boolean().required().error(() => new SchemaError('Expect a required boolean.')),
+});
+
+router.put('/orders/:id/activate', guard({ auth: constants.AUTH, constants: constants.ADMIN }), validateSchema({ body: orderActivateSchema }), async (req, res) => {
+  try {
+    const { active } = req.body;
+
+    const _id = req.params.id || '';
+
+    if (!db.Types.ObjectId.isValid(_id)) {
+      return res.status(400).json({
+        success: false,
+        errors: ['Invalid parameters.'],
+      });
+    }
+
+    if (!await orders.model.exists({ _id })) {
+      return res.status(404).json({ success: false, errors: ['Resource does not exist.'] });
+    }
+
+    await orders.model.updateOne({ _id }, { active });
+
+    res.json({
+      success: true
+    });
+
+  } catch {
+    res.status(500).end();
   }
 })
