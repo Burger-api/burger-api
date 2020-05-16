@@ -44,7 +44,7 @@ router.post('/auth/register', guard({ auth: constants.NOT_AUTH }), async (req, r
   }
 
   if (errors.has_errors) {
-    return res.send({
+    return res.status(400).json({
       errors: errors.messages,
     })
   }
@@ -95,5 +95,5 @@ router.post('/auth/login', guard({ auth: constants.NOT_AUTH }), async (req, res)
     }
   }
 
-  res.send(ErrorsGenerator.gen(['Credentials do not match.']))
+  res.status(400).send(ErrorsGenerator.gen(['Credentials do not match.']))
 });
