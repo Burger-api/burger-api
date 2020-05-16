@@ -4,7 +4,8 @@ export const model = db.model('Product', {
   name: { type: String, },
   category: { type: String, },
   price: { type: Number, },
-  active: { type: Boolean, default: true },
+  active: { type: Boolean, default: true, },
+  promoted: { type: Boolean, default: false, },
   date: { type: Date, default: Date.now, },
 });
 
