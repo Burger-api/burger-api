@@ -1,8 +1,8 @@
 import XRegExp from 'xregexp';
 
-import db from '../db'
+import db from '../db';
 
-import * as tokens from './tokens'
+import * as tokens from './tokens';
 
 export const model = db.model('User', {
   username: { type: String, },
@@ -27,7 +27,7 @@ export async function find_by_token(token) {
     expires: { $gt: Date.now(), }
   });
 
-  return model.findById(user)
+  return model.findById(user);
 }
 
 export function sanitize(user) {
@@ -38,5 +38,5 @@ export function sanitize(user) {
     username: user.username,
     email: user.email,
     registered: user.created,
-  }
+  };
 }

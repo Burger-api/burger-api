@@ -25,7 +25,7 @@ app.use(body_parser.json());
 
 app.use(token_middleware);
 app.use(auth_middleware);
-app.use(status_middleware)
+app.use(status_middleware);
 
 app.use(cors());
 

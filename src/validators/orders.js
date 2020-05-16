@@ -14,4 +14,4 @@ export const bodySchema = Joi.object().keys({
     .error(() => new SchemaError('Please provide products list')),
   connectedUserId: Joi.string(),
   status: Joi.string(),
-})
+});

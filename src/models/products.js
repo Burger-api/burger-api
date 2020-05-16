@@ -12,14 +12,14 @@ export const model = db.model('Product', {
 
 export async function checkAndGetAllById(productsId) {
   try {
-    const products = []
+    const products = [];
     for (const id of productsId) {
-      const product = await model.findById(id)
+      const product = await model.findById(id);
 
       if (!product) {
-        return { errors: `One of the passed product doesn't exist` }
+        return { errors: `One of the passed product doesn't exist` };
       } else {
-        products.push(product)
+        products.push(product);
       }
     }
 
@@ -28,4 +28,4 @@ export async function checkAndGetAllById(productsId) {
     throw new Error(e.message);
 
   }
-}
+};

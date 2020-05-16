@@ -6,12 +6,12 @@ const productSchema = db.Schema(
     original_name: { type: String },
     original_category: { type: String },
     original_price: { type: Number }
-  }, { _id: false })
+  }, { _id: false });
 
 const menuSchema = db.Schema({
   original_id: { type: String },
   original_products: [productSchema]
-}, { _id: false })
+}, { _id: false });
 
 
 export const model = db.model('Order', {
@@ -32,5 +32,5 @@ export async function sanitizeInsertedProducts(products) {
       original_category: product.category,
       original_price: product.price,
     }
-  })
+  });
 }
