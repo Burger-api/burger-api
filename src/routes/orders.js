@@ -1,4 +1,4 @@
-import {Router} from 'express'
+import { Router } from 'express'
 import Joi from '@hapi/joi';
 
 import * as constants from '../constants'
@@ -6,8 +6,8 @@ import guard from '../middlewares/guard'
 import * as orders from '../models/orders'
 import * as menus from '../models/menus'
 import * as products from '../models/products'
-import validateSchema, {SchemaError} from '../middlewares/joi-schema'
-import {bodySchema} from '../validators/orders'
+import validateSchema, { SchemaError } from '../middlewares/joi-schema'
+import { bodySchema } from '../validators/orders'
 import db from "../db";
 
 const router = Router();
@@ -151,14 +151,7 @@ router.put('/orders/checkin/:id', guard({ auth: constants.AUTH, constants: const
   }
 })
 
-/**
- * @typedef SchemasOptions
- */
-const orderActivateSchema = Joi.object().keys({
-  active: Joi.boolean().required().error(() => new SchemaError('Expect a required boolean.')),
-});
-
-router.put('/orders/:id/activate', guard({ auth: constants.AUTH, constants: constants.ADMIN }), validateSchema({ body: orderActivateSchema }), async (req, res) => {
+router.delete('/orders/:id', guard({ auth: constants.AUTH, constants: constants.ADMIN }), async (req, res) => {
   try {
     const { active } = req.body;
 
@@ -175,7 +168,7 @@ router.put('/orders/:id/activate', guard({ auth: constants.AUTH, constants: cons
       return res.status(404).json({ success: false, errors: ['Resource does not exist.'] });
     }
 
-    await orders.model.updateOne({ _id }, { active });
+    await orders.model.deleteOne({ _id });
 
     res.json({
       success: true
