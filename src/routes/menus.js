@@ -137,7 +137,7 @@ router.put('/menus/:id',
         return res.status(400).json({ success: false, errors: ['Invalid parameters.'], });
       }
 
-      const { name, products, limits, price, promotion_start, promotion_end } = req.body || {};
+      const { name, products, limits, price, active = true, promotion_start, promotion_end } = req.body || {};
       const errors = await menus.isValid(products, limits);
       const menusList = await model.find({ name });
 
@@ -157,6 +157,7 @@ router.put('/menus/:id',
         default_products: products,
         limits,
         price,
+        active,
         promotion_start,
         promotion_end,
       });
