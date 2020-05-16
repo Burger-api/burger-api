@@ -14,7 +14,7 @@ export default router;
 
 router.get('/menus',async (req, res) => {
   try {
-    const result = await menus.model.find().populate('default_products');
+    const result = await menus.model.find({ active: true, promotion_start: null, promotion_end: null }).populate('default_products');
 
     res.status(200).json({ success: true, menus: result, });
 
@@ -23,9 +23,9 @@ router.get('/menus',async (req, res) => {
   }
 });
 
-router.get('/menus/classic', async (req, res) => {
+router.get('/menus/disabled', async (req, res) => {
   try {
-    const result = await menus.model.find({ promotion_start: null, promotion_end: null }).populate('default_products');
+    const result = await menus.model.find({ active: false, promotion_start: null, promotion_end: null }).populate('default_products');
 
     res.json({ success: true, menus: result });
   } catch (e) {
@@ -137,7 +137,7 @@ router.put('/menus/:id',
         return res.status(400).json({ success: false, errors: ['Invalid parameters.'], });
       }
 
-      const { name, products, limits, price, promotion_start, promotion_end } = req.body || {};
+      const { name, products, limits, price, active = true, promotion_start, promotion_end } = req.body || {};
       const errors = await menus.isValid(products, limits);
       const menusList = await model.find({ name });
 
@@ -157,6 +157,7 @@ router.put('/menus/:id',
         default_products: products,
         limits,
         price,
+        active,
         promotion_start,
         promotion_end,
       });

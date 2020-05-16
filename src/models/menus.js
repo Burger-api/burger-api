@@ -15,6 +15,8 @@ export const model = db.model('Menu', {
   price: { type: Number, },
   limits: { type: Limit, ref: 'Limit' },
   default_products: [{ type: db.Types.ObjectId, ref: 'Product', }],
+  active: { type: Boolean, default: true, },
+  promoted: { type: Boolean, default: false, },
   promotion_start: { type: Date, default: null },
   promotion_end: { type: Date, default: null },
   date: { type: Date, default: Date.now, }
