@@ -6,6 +6,7 @@ import guard from '../middlewares/guard'
 import * as orders from '../models/orders'
 import * as menus from '../models/menus'
 import * as products from '../models/products'
+import * as users from '../models/users'
 import validateSchema, { SchemaError } from '../middlewares/joi-schema'
 import { bodySchema } from '../validators/orders'
 import db from "../db";
@@ -66,6 +67,36 @@ router.get('/orders/pending', guard({ auth: constants.AUTH, requested_status: co
   }
 });
 
+router.get('/orders/user/:id', guard({ auth: constants.AUTH, requested_status: constants.CUSTOMER }), async (req, res) => {
+  try {
+
+    const userId = req.params.id || '';
+
+    if (!db.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({
+        success: false,
+        errors: ['Invalid parameters.'],
+      });
+    }
+    
+    if (!await users.model.exists({ _id: userId })) {
+      return res.status(404).json({ success: false, errors: ['Resource does not exist.'] });
+    }
+
+    const user = await users.model.find({ _id: userId })
+    const result = await orders.model.find({ customer: user._id }).populate('data');
+
+    res.json({
+      success: true,
+      orders: result,
+    });
+
+  } catch {
+    res.status(500).end();
+  }
+})
+
+
 router.post('/orders', guard({ requested_status: constants.CUSTOMER }),
   validateSchema({ body: bodySchema }),
   async (req, res) => {
@@ -119,7 +150,7 @@ router.post('/orders', guard({ requested_status: constants.CUSTOMER }),
 
   });
 
-router.put('/orders/checkin/:id', guard({ auth: constants.AUTH, constants: constants.COOKER }), async (req, res) => {
+router.put('/orders/checkin/:id', guard({ auth: constants.AUTH, requested_status: constants.COOKER }), async (req, res) => {
   try {
     const _id = req.params.id || '';
 
@@ -151,7 +182,7 @@ router.put('/orders/checkin/:id', guard({ auth: constants.AUTH, constants: const
   }
 })
 
-router.delete('/orders/:id', guard({ auth: constants.AUTH, constants: constants.ADMIN }), async (req, res) => {
+router.delete('/orders/:id', guard({ auth: constants.AUTH, requested_status: constants.ADMIN }), async (req, res) => {
   try {
     const { active } = req.body;
 

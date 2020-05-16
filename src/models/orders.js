@@ -19,7 +19,7 @@ export const model = db.model('Order', {
   standalone_products: [productSchema],
   price: { type: Number },
   status: { type: String, default: 'pending' },
-  customer: { type: db.Types.ObjectId, ref: 'User' },
+  customer: { type: String, default: null },
   created: { type: Date, default: Date.now, },
 });
 
