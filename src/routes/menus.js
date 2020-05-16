@@ -14,7 +14,7 @@ export default router;
 
 router.get('/menus',async (req, res) => {
   try {
-    const result = await menus.model.find().populate('default_products');
+    const result = await menus.model.find({ active: true, promotion_start: null, promotion_end: null }).populate('default_products');
 
     res.status(200).json({ success: true, menus: result, });
 
@@ -23,9 +23,9 @@ router.get('/menus',async (req, res) => {
   }
 });
 
-router.get('/menus/classic', async (req, res) => {
+router.get('/menus/disabled', async (req, res) => {
   try {
-    const result = await menus.model.find({ promotion_start: null, promotion_end: null }).populate('default_products');
+    const result = await menus.model.find({ active: false, promotion_start: null, promotion_end: null }).populate('default_products');
 
     res.json({ success: true, menus: result });
   } catch (e) {
