@@ -21,30 +21,30 @@ router.post('/auth/register', guard({ auth: constants.NOT_AUTH }), async (req, r
   const { username, email, password } = req.body || {};
   const errors = new ErrorsGenerator();
 
-  errors.assert(typeof username === 'string', "Invalid username.");
-  errors.assert(typeof email === 'string', "Invalid email.");
-  errors.assert(typeof password === 'string', "The password does not match the conditions.");
+  errors.assert(typeof username === 'string', 'Invalid username.');
+  errors.assert(typeof email === 'string', 'Invalid email.');
+  errors.assert(typeof password === 'string', 'The password does not match the conditions.');
 
   if (!errors.has_errors) {
     if (users.username_regex.test(username)) {
       const exists = await users.model.exists({ username });
-      errors.assert(!exists, "This username is already used.")
+      errors.assert(!exists, 'This username is already used.')
     } else {
-      errors.push("The username does not match the conditions.")
+      errors.push('The username does not match the conditions.')
     }
 
     if (users.email_regex.test(email)) {
       const exists = await users.model.exists({ email });
-      errors.assert(!exists, "This email is already used.")
+      errors.assert(!exists, 'This email is already used.')
     } else {
-      errors.push("The email is not valid.")
+      errors.push('The email is not valid.')
     }
 
-    errors.assert(users.password_regex.test(password), "The password does not match the conditions.")
+    errors.assert(users.password_regex.test(password), 'The password does not match the conditions.')
   }
 
   if (errors.has_errors) {
-    return res.send({
+    return res.status(400).json({
       errors: errors.messages,
     })
   }
@@ -74,7 +74,7 @@ router.post('/auth/login', guard({ auth: constants.NOT_AUTH }), async (req, res)
     if (users.password_regex.test(password)) {
       try {
         const user = await users.model.findOne({
-          [username_is_email ? "email" : "username"]: username,
+          [username_is_email ? 'email' : 'username']: username,
         });
 
         const valid = await hash.verify(user.password, password);
@@ -95,5 +95,5 @@ router.post('/auth/login', guard({ auth: constants.NOT_AUTH }), async (req, res)
     }
   }
 
-  res.send(ErrorsGenerator.gen(['Credentials do not match.']))
+  res.status(400).send(ErrorsGenerator.gen(['Credentials do not match.']))
 });
