@@ -22,7 +22,7 @@ router.get('/orders', guard({ auth: constants.AUTH, requested_status: constants.
       orders: result,
     });
   } catch (e) {
-    return res.status(500).json({ success: false, errors: [e], });
+    return res.status(500).json({ success: false, errors: [e.message], });
   }
 });
 
@@ -49,7 +49,7 @@ router.get('/orders/:id', guard({ auth: constants.AUTH, requested_status: consta
       orders: result,
     });
   } catch (e) {
-    return res.status(500).json({ success: false, errors: [e], });
+    return res.status(500).json({ success: false, errors: [e.message], });
   }
 });
 
@@ -61,8 +61,8 @@ router.get('/orders/pending', guard({ auth: constants.AUTH, requested_status: co
       success: true,
       orders: result,
     });
-  } catch {
-    return res.status(500).json({ success: false, errors: [e], });
+  } catch (e) {
+    return res.status(500).json({ success: false, errors: [e.message], });
   }
 });
 
@@ -143,7 +143,7 @@ router.put('/orders/checkin/:id', guard({ auth: constants.AUTH, constants: const
       })
 
     return res.status(200).json({
-      succes: true,
+      success: true,
     })
   } catch (e) {
     return res.status(500).json({ success: false, errors: ['an error occured'], });
