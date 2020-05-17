@@ -22,7 +22,7 @@ router.get('/highlights', async (req, res) => {
   }
 });
 
-router.put('highlights/:id',
+router.put('/highlights/:id',
   guard({ auth: constants.AUTH, requested_status: constants.ADMIN }), async (req, res) => {
     try {
       const _id = req.params.id || '';
