@@ -1,7 +1,7 @@
 import {Router} from 'express';
 
-import db from '../db'
-import * as constants from '../constants'
+import db from '../db';
+import * as constants from '../constants';
 
 import * as products from '../models/products';
 import * as menus from '../models/menus';

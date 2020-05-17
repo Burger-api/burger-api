@@ -1,10 +1,10 @@
 import {Router} from 'express';
-import {bodySchema} from '../validators/menus'
+import {bodySchema} from '../validators/menus';
 
 import db from '../db';
 import * as constants from '../constants';
 import guard from '../middlewares/guard';
-import validateSchema from '../middlewares/joi-schema'
+import validateSchema from '../middlewares/joi-schema';
 
 import * as menus from '../models/menus';
 import {model} from '../models/menus';
@@ -29,7 +29,7 @@ router.get('/menus/disabled', async (req, res) => {
 
     res.json({ success: true, menus: result });
   } catch (e) {
-    res.status(500).json({ success: false, errors: [e.message] })
+    res.status(500).json({ success: false, errors: [e.message] });
   }
 });
 
@@ -59,7 +59,7 @@ router.get('/menus/promotions/ongoing', async (req, res) => {
 
     res.json({ success: true, menus: result });
   } catch (e) {
-    res.status(500).json({ success: false, errors: [e.message] })
+    res.status(500).json({ success: false, errors: [e.message] });
   }
 });
 
@@ -69,7 +69,7 @@ router.get('/menus/promotions/ended', async (req, res) => {
 
     res.json({ success: true, menus: result });
   } catch (e) {
-    res.status(500).json({ success: false, errors: [e.message] })
+    res.status(500).json({ success: false, errors: [e.message] });
   }
 });
 
@@ -78,7 +78,7 @@ router.get('/menus/:id', async  (req, res) => {
     const _id = req.params.id || '';
 
     if (!db.Types.ObjectId.isValid(_id)) {
-      return res.status(400).json({ success: false, errors: ['Invalid parameters.']})
+      return res.status(400).json({ success: false, errors: ['Invalid parameters.']});
     }
 
     const menu = await menus.model.findById({ _id });
@@ -92,7 +92,7 @@ router.get('/menus/:id', async  (req, res) => {
   } catch (e) {
     res.status(500).json({ success: false, errors: [e.message], });
   }
-})
+});
 
 router.post('/menus',
   guard({ auth: constants.AUTH, requested_status: constants.ADMIN }),
@@ -103,7 +103,7 @@ router.post('/menus',
       const errors = await menus.isValid(products, limits);
 
       if (await model.exists({ name })) {
-        errors.push('This name is already used for an existing menu.')
+        errors.push('This name is already used for an existing menu.');
       }
 
       if (errors.length) {

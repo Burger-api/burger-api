@@ -1,5 +1,5 @@
 import db from "../db";
-import * as products from "./products"
+import * as products from "./products";
 
 export const Limit = new db.Schema({
   burgers: { type: Number, default: 0, },
@@ -33,11 +33,11 @@ export async function isValid(defaultProducts, limits) {
     const errors = [];
 
     if (sumOfLimits < 2) {
-      errors.push('A menu contains at least two products.')
+      errors.push('A menu contains at least two products.');
     }
 
     if (!await validateProductsAndLimits(defaultProducts, limits)) {
-      errors.push('The default products do not match with the limits set.')
+      errors.push('The default products do not match with the limits set.');
     }
 
     return errors;
@@ -85,21 +85,21 @@ async function validateProductsAndLimits(defaultProducts, limits) {
 
 export async function checkAndGetAllByIds(menuArray) {
   try {
-    const menusFilledArray = []
+    const menusFilledArray = [];
     for (const menuData of menuArray) {
 
-      const menu = await model.findById(menuData.id)
+      const menu = await model.findById(menuData.id);
       if (!menu) {
-        return { errors: `Required menu doesn't exist` }
+        return { errors: `Required menu doesn't exist` };
       }
 
-      const productsData = await products.checkAndGetAllById(menuData.products)
+      const productsData = await products.checkAndGetAllById(menuData.products);
       if (productsData.errors) {
-        return { errors: productsData.errors }
+        return { errors: productsData.errors };
       }
 
       if (!await validateProductsAndLimits(menuData.products, menu.limits)) {
-        return { errors: `Passed list of products doesn't match menu limit` }
+        return { errors: `Passed list of products doesn't match menu limit` };
       }
 
       menusFilledArray.push({
@@ -107,7 +107,7 @@ export async function checkAndGetAllByIds(menuArray) {
         original_name: menu.name,
         original_products: productsData,
         original_price: menu.price,
-      })
+      });
     }
 
     return menusFilledArray

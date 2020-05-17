@@ -1,6 +1,6 @@
-import crypto from 'crypto'
+import crypto from 'crypto';
 
-import db from '../db'
+import db from '../db';
 
 export const model = db.model('Token', {
   value: { type: String, },
@@ -20,7 +20,7 @@ export async function check(token) {
   return await model.exists({
     value: token,
     expires: { $gt: Date.now(), }
-  })
+  });
 }
 
 /**
@@ -36,5 +36,5 @@ export function create(user, never_expires = false) {
     value: token,
     user,
     expires,
-  })
+  });
 }
