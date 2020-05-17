@@ -27,6 +27,20 @@ router.get('/orders', guard({ auth: constants.AUTH, requested_status: constants.
   }
 });
 
+router.get('/orders/pending', guard({ auth: constants.AUTH, requested_status: constants.COOKER }), async (req, res) => {
+  try {
+    const result = await orders.model.find({ status: 'pending' }).populate('data');
+
+    res.json({
+      success: true,
+      orders: result,
+    });
+  } catch (e) {
+    return res.status(500).json({ success: false, errors: [e.message], });
+  }
+});
+
+
 router.get('/orders/:id', guard({ auth: constants.AUTH, requested_status: constants.ADMIN }), async (req, res) => {
   try {
 
@@ -44,19 +58,6 @@ router.get('/orders/:id', guard({ auth: constants.AUTH, requested_status: consta
     }
 
     const result = await orders.model.findById({ _id });
-
-    res.json({
-      success: true,
-      orders: result,
-    });
-  } catch (e) {
-    return res.status(500).json({ success: false, errors: [e.message], });
-  }
-});
-
-router.get('/orders/pending', guard({ auth: constants.AUTH, requested_status: constants.COOKER }), async (req, res) => {
-  try {
-    const result = await orders.model.find({ status: 'pending' }).populate('data');
 
     res.json({
       success: true,
