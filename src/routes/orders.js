@@ -101,7 +101,12 @@ router.post('/orders', guard({ requested_status: constants.CUSTOMER }),
   validateSchema({ body: bodySchema }),
   async (req, res) => {
     try {
-      const { menusData, standaloneProducts, connectedUserId, status } = req.body || {};
+      const { menusData, standaloneProducts, connectedUserId } = req.body || {};
+      let status = req.body.status
+
+      if (req.user_status !== constants.ADMIN) {
+         status = 'pending';
+      }
 
       const filledMenus = await menus.checkAndGetAllByIds(menusData);
 
@@ -131,7 +136,7 @@ router.post('/orders', guard({ requested_status: constants.CUSTOMER }),
       const fullMenuPrice = filledMenus.reduce((acc, menu) => { return acc + menu.original_price }, 0);
       const fullProductsPrice = filledStandAloneProducts.reduce((acc, product) => { return acc + product.original_price }, 0);
       const fullPrice = fullMenuPrice + fullProductsPrice;
-      ;
+
       const order = await orders.model.create({
         menus: filledMenus,
         standalone_products: filledStandAloneProducts,
