@@ -24,28 +24,20 @@ router.get('/users/me', guard({ auth: constants.AUTH }), async (req, res) => {
 });
 
 router.get('/users/search', guard({ auth: constants.AUTH, requested_status: constants.ADMIN }), async (req, res) => {
-  const { username } = req.query;
   try {
+    const { username } = req.query;
     if (username) {
       if ((typeof username !== 'string') && (typeof username !== 'number')) {
         return res.statusCode(400).send(ErrorsGenerator.gen(['"username" parameter must be a string.']));
       }
+      const found = await users.model.find({
+        username: { $regex: `.*${username}.*` },
+      }).limit(10).lean();
 
-      try {
-        const found = await users.model.find({
-          username: { $regex: `.*${username}.*` },
-        }).limit(10).lean();
-
-        res.send({
-          success: true,
-          users: found.map(users.sanitize),
-        });
-      } catch {
-        res.send({
-          success: true,
-          users: [],
-        });
-      }
+      res.send({
+        success: true,
+        users: found.map(users.sanitize),
+      });
     } else {
       res.statusCode(400).end(ErrorsGenerator.gen(['"username" parameter required.']));
     }
