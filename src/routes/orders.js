@@ -27,6 +27,20 @@ router.get('/orders', guard({ auth: constants.AUTH, requested_status: constants.
   }
 });
 
+router.get('/orders/pending', guard({ auth: constants.AUTH, requested_status: constants.COOKER }), async (req, res) => {
+  try {
+    const result = await orders.model.find({ status: 'pending' }).populate('data');
+
+    res.json({
+      success: true,
+      orders: result,
+    });
+  } catch (e) {
+    return res.status(500).json({ success: false, errors: [e.message], });
+  }
+});
+
+
 router.get('/orders/:id', guard({ auth: constants.AUTH, requested_status: constants.ADMIN }), async (req, res) => {
   try {
 
@@ -54,41 +68,27 @@ router.get('/orders/:id', guard({ auth: constants.AUTH, requested_status: consta
   }
 });
 
-router.get('/orders/pending', guard({ auth: constants.AUTH, requested_status: constants.COOKER }), async (req, res) => {
-  try {
-    const result = await orders.model.find({ status: 'pending' }).populate('data');
-
-    res.json({
-      success: true,
-      orders: result,
-    });
-  } catch (e) {
-    return res.status(500).json({ success: false, errors: [e.message], });
-  }
-});
-
 router.get('/orders/user/:id', guard({ auth: constants.AUTH, requested_status: constants.CUSTOMER }), async (req, res) => {
   try {
 
-    const userId = req.params.id || '';
+    const _id = req.params.id || '';
 
-    if (!db.Types.ObjectId.isValid(userId)) {
+    if (!db.Types.ObjectId.isValid(_id)) {
       return res.status(400).json({
         success: false,
         errors: ['Invalid parameters.'],
       });
     }
-    
-    if (!await users.model.exists({ _id: userId })) {
+
+    if (!await users.model.exists({ _id })) {
       return res.status(404).json({ success: false, errors: ['Resource does not exist.'] });
     }
 
-    const user = await users.model.find({ _id: userId })
-    const result = await orders.model.find({ customer: user._id }).populate('data');
+    const results = await orders.model.find({ customer: _id }).populate('data');
 
     res.json({
       success: true,
-      orders: result,
+      orders: results,
     });
 
   } catch {
@@ -101,7 +101,12 @@ router.post('/orders', guard({ requested_status: constants.CUSTOMER }),
   validateSchema({ body: bodySchema }),
   async (req, res) => {
     try {
-      const { menusData, standaloneProducts, connectedUserId, status } = req.body || {};
+      const { menusData, standaloneProducts, connectedUserId } = req.body || {};
+      let status = req.body.status
+
+      if (req.user_status !== constants.ADMIN) {
+         status = 'pending';
+      }
 
       const filledMenus = await menus.checkAndGetAllByIds(menusData);
 
@@ -131,7 +136,7 @@ router.post('/orders', guard({ requested_status: constants.CUSTOMER }),
       const fullMenuPrice = filledMenus.reduce((acc, menu) => { return acc + menu.original_price }, 0);
       const fullProductsPrice = filledStandAloneProducts.reduce((acc, product) => { return acc + product.original_price }, 0);
       const fullPrice = fullMenuPrice + fullProductsPrice;
-;
+
       const order = await orders.model.create({
         menus: filledMenus,
         standalone_products: filledStandAloneProducts,
