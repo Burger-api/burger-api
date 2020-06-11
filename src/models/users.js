@@ -2,23 +2,20 @@ import XRegExp from 'xregexp';
 
 import db from '../db';
 
-const Content = db.Schema({
-  name: { type: String },
-  amount: { type: Number },
-}, { _id: false })
-
 const Todolist = db.Schema({
   name: { type: String },
-  todos: [{ type: Content }],
-  last_add_time: { type: Date },
-  creation_time: { type: Date, default: Date.now() }
+  todos: [{ type: String }],
 }, { _id: false })
 
 export const model = db.model('User', {
   first_name: { type: String, },
-  last_name: { type: String },
-  email: { type: String },
+  lazst_name: { type: String },
   birthdate: { type: Date, },
-  password: { type: String },
   todolist: { type: Todolist, default: null }
 });
+
+export const username_regex = XRegExp('^[\\p{L}0-9_]{5,20}$');
+
+export const email_regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+export const password_regex = /^(?=.*[a-z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/;
