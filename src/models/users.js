@@ -5,7 +5,7 @@ import db from '../db';
 const Todolist = db.Schema({
   name: { type: String },
   todos: [{ type: String }],
-}, { _id: false })
+})
 
 export const model = db.model('User', {
   first_name: { type: String, },

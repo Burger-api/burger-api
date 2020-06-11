@@ -5,8 +5,7 @@
   "main": "src/app.js",
   "scripts": {
     "dev": "nodemon --exec babel-node .",
-    "start": "babel-node .",
-    "test": "mocha --require @babel/register"
+    "start": "babel-node ."
   },
   "keywords": [],
   "author": "",
@@ -18,10 +17,8 @@
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "faker": "^4.1.0",
     "glob": "^7.1.6",
     "helmet": "^3.21.2",
-    "mocha": "^7.2.0",
     "mongoose": "^5.9.0",
     "xregexp": "^4.3.0"
   },
